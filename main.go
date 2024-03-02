@@ -16,18 +16,14 @@ func main() {
 	stripe.Key = "sk_test_51OpcPfHVyvJVrH9E5AEuUFa7ynSwVCL2KhaI6xtOSTfmSjBFRUnn2O6tDlYOkyjHsfawONwvb6LPE4JCbnw2g90k0011fynIOm"
 
 
-	http.HandleFunc("/", handle11)
-	http.HandleFunc("/create-payment-intent", handlePaymentSheet)
+	
+	http.HandleFunc("/", handlePaymentSheet)
 
 	addr := "localhost:8081"
 	log.Printf("Listening on %s ...", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
 
-func handle11(w http.ResponseWriter, r *http.Request){
-	message := "Witaj! Twoje żądanie zostało odebrane przez serwer."
-	w.Write([]byte(message))
-}
 
 func handlePaymentSheet(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
