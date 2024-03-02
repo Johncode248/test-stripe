@@ -18,6 +18,7 @@ func main() {
 
 	
 	http.HandleFunc("/", handlePaymentSheet)
+	http.HandleFunc("/bla", handlePaymentSheet)
 
 	addr := "localhost:8081"
 	log.Printf("Listening on %s ...", addr)
