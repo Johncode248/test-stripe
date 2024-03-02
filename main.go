@@ -19,7 +19,8 @@ func main() {
 	http.Handle("/", fs)
 	http.HandleFunc("/create-payment-intent", handleCreatePaymentIntent)
 
-	addr := "localhost:4242"
+	addr := "https://johncode248.github.io/test-stripe/"
+
 	log.Printf("Listening on %s ...", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
