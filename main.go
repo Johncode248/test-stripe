@@ -19,7 +19,7 @@ func main() {
 	http.Handle("/", fs)
 	http.HandleFunc("/create-payment-intent", handleCreatePaymentIntent)
 
-	addr := "https://johncode248.github.io/test-stripe/"
+	addr := "https://serene-toffee-ca0ebc.netlify.app"
 
 	log.Printf("Listening on %s ...", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
