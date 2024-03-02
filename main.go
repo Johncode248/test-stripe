@@ -15,10 +15,8 @@ func main() {
 	// This is your test secret API key.
 	stripe.Key = "sk_test_51OpcPfHVyvJVrH9E5AEuUFa7ynSwVCL2KhaI6xtOSTfmSjBFRUnn2O6tDlYOkyjHsfawONwvb6LPE4JCbnw2g90k0011fynIOm"
 
-
-	
-	http.HandleFunc("/", handlePaymentSheet)
-	http.HandleFunc("/bla", handlePaymentSheet)
+	http.HandleFunc("/", handle11)
+	http.HandleFunc("/create-payment-intent", handlePaymentSheet)
 
 	addr := "localhost:8081"
 	log.Printf("Listening on %s ...", addr)
