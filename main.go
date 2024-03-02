@@ -24,69 +24,49 @@ func main() {
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
 
-type item struct {
-	id string
-}
+// Set your secret key. Remember to switch to your live secret key in production.
+// See your keys here: https://dashboard.stripe.com/apikeys
+stripe.Key = "sk_test_51OpcPfHVyvJVrH9E5AEuUFa7ynSwVCL2KhaI6xtOSTfmSjBFRUnn2O6tDlYOkyjHsfawONwvb6LPE4JCbnw2g90k0011fynIOm"
 
-func calculateOrderAmount(items []item) int64 {
-	// Replace this constant with a calculation of the order's amount
-	// Calculate the order total on the server to prevent
-	// people from directly manipulating the amount on the client
-	return 1400
-}
+func handlePaymentSheet(w http.ResponseWriter, r *http.Request) {
+  if r.Method != "POST" {
+    http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+    return
+  }
 
-func handleCreatePaymentIntent(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		return
-	}
+  // Use an existing Customer ID if this is a returning customer.
+  cparams := &stripe.CustomerParams{}
+  c, _ := customer.New(cparams)
 
-	var req struct {
-		Items []item `json:"items"`
-	}
+  ekparams := &stripe.EphemeralKeyParams{
+    Customer: stripe.String(c.ID),
+    StripeVersion: stripe.String("2023-10-16"),
+  }
+  ek, _ := ephemeralKey.New(ekparams)
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Printf("json.NewDecoder.Decode: %v", err)
-		return
-	}
+  piparams := &stripe.PaymentIntentParams{
+    Amount:   stripe.Int64(1099),
+    Currency: stripe.String(string(stripe.CurrencyEUR)),
+    Customer: stripe.String(c.ID),
+    PaymentMethodTypes: []*string{
+      stripe.String("bancontact"),
+      stripe.String("card"),
+      stripe.String("ideal"),
+      stripe.String("klarna"),
+      stripe.String("sepa_debit"),
+    },
+  }
+  pi, _ := paymentintent.New(piparams)
 
-	// Create a PaymentIntent with amount and currency
-	params := &stripe.PaymentIntentParams{
-		Amount:   stripe.Int64(calculateOrderAmount(req.Items)),
-		Currency: stripe.String(string(stripe.CurrencyUSD)),
-		// In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
-		AutomaticPaymentMethods: &stripe.PaymentIntentAutomaticPaymentMethodsParams{
-			Enabled: stripe.Bool(true),
-		},
-	}
-
-	pi, err := paymentintent.New(params)
-	log.Printf("pi.New: %v", pi.ClientSecret)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Printf("pi.New: %v", err)
-		return
-	}
-
-	writeJSON(w, struct {
-		ClientSecret string `json:"clientSecret"`
-	}{
-		ClientSecret: pi.ClientSecret,
-	})
-}
-
-func writeJSON(w http.ResponseWriter, v interface{}) {
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(v); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Printf("json.NewEncoder.Encode: %v", err)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	if _, err := io.Copy(w, &buf); err != nil {
-		log.Printf("io.Copy: %v", err)
-		return
-	}
+  writeJSON(w, struct {
+    PaymentIntent  string `json:"paymentIntent"`
+    EphemeralKey   string `json:"ephemeralKey"`
+    Customer       string `json:"customer"`
+    PublishableKey string `json:"publishableKey"`
+  }{
+    PaymentIntent: pi.ClientSecret,
+    EphemeralKey: ek.Secret,
+    Customer: c.ID,
+    PublishableKey: "pk_test_51OpcPfHVyvJVrH9E6fZD7MehGxcmrvAGaX1y1gWrQrUgXlki94f9MlnxWUoheeE6my1fITxokmAojqHtjQisolxp00VpgM8Zb3",
+  })
 }
