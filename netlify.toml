@@ -1,3 +1,2 @@
 [build]
   command = "go build -o netlify/functions/main ./main.go"
-  functionsDirectory: "/opt/build/repo/netlify/functions"
