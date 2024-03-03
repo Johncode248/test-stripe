@@ -1,3 +1,0 @@
-[build]
-  command = "go build -o netlify/functions/ main.go"
-  functions = "netlify/functions"
