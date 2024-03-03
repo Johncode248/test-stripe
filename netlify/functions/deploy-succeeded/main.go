@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 
 	"net/http"
 
@@ -15,6 +16,7 @@ import (
 
 func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	if request.HTTPMethod != "POST" {
+		log.Print("Invalid HTTP method: ", request.HTTPMethod)
 		return &events.APIGatewayProxyResponse{Body: http.StatusText(http.StatusMethodNotAllowed), StatusCode: http.StatusMethodNotAllowed}, nil
 	}
 
