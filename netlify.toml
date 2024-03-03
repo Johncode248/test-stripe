@@ -1,6 +1,5 @@
 [build]
   command = "go build -o netlify/functions/main ./main.go"
-  commandOrigin: config
   publish: /opt/build/repo
   publishOrigin: default
   functionsDirectory: /opt/build/repo/netlify/functions
