@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"os"
 
 	"net/http"
 
@@ -63,5 +64,9 @@ func main() {
 	// This is your test secret API key.
 	stripe.Key = "sk_test_51OpcPfHVyvJVrH9E5AEuUFa7ynSwVCL2KhaI6xtOSTfmSjBFRUnn2O6tDlYOkyjHsfawONwvb6LPE4JCbnw2g90k0011fynIOm"
 
+	// Define AWS Lambda environment variables
+	os.Setenv("_LAMBDA_SERVER_PORT", "3000")
+	//os.Setenv("AWS_LAMBDA_RUNTIME_API", "runtime.somewhere.com")
+	//lambda.StartHandler(&handler{})
 	lambda.Start(handler)
 }
